@@ -1,0 +1,35 @@
+name: CI Tests run
+on:
+  pull_request: 
+    types: ['opened']
+jobs:
+  lint-playwroght:
+    name: 'Apply Linter to playwright tests'
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-slim
+    steps:
+      - uses: actions/checkout@v4
+      - name: check node
+        run: node -v
+      - name: Install dependecies
+        working-directory: ./playwright
+        run: npm i
+      - name: Run lint
+        working-directory: ./playwright
+        run: npm run lint
+  lint-cypress:
+    name: 'Apply Linter to cypress tests'
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-slim
+    steps:
+      - uses: actions/checkout@v4
+      - name: check node
+        run: node -v
+      - name: Install dependecies
+        working-directory: ./cypress
+        run: npm i
+      - name: Run lint
+        working-directory: ./cypress
+        run: npm run lint
