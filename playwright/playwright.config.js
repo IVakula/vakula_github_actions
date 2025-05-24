@@ -23,12 +23,13 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [['list'] ,['html', { open: 'never' }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     baseURL: process.env.BASE_URL,
     //headless: false,
     headless: true,
+    video: 'retain-on-failure',
     httpCredentials: {
       username: process.env.HTTP_CREDENTIAL_USERNAME,
       password: process.env.HTTP_CREDENTIAL_PASSWORD,
