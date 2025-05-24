@@ -142,7 +142,7 @@ dist
 .pnp.*
 
 # Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+/playwright/test-results/
+/playwright/playwright-report/
+/playwright/blob-report/
+/playwright/playwright/.cache/
