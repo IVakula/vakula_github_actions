@@ -1,44 +1,122 @@
-name: CI Tests run
+name: CI for Playwright/Cypress
+
 on:
   push:
-    branches:
-      - "*"
-  pull_request: 
-    types: ['opened']
+    paths:
+      - 'playwright/**'
+      - 'cypress/**'
+  pull_request:
+    paths:
+      - 'playwright/**'
+      - 'cypress/**'
+
 jobs:
-#  lint-playwright:
-#    name: 'Apply Linter to playwright tests'
-#    if: ${{github.}}
-#    runs-on: ubuntu-latest
-#    container:
-#      image: node:22-slim
-#    steps:
-#      - uses: actions/checkout@v4
-#      - name: check node
-#        run: node -v
-#      - name: Install dependecies
-#        working-directory: ./playwright
-#        run: npm i
-#      - name: Run lint
-#        working-directory: ./playwright
-#        run: npm run lint
-  lint-cypress:
-    name: 'Apply Linter to cypress tests'
+  detect-changes:
     runs-on: ubuntu-latest
-#    container:
-#      image: node:22-slim
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+      playwright_changed: ${{ steps.set.outputs.playwright }}
+      cypress_changed: ${{ steps.set.outputs.cypress }}
     steps:
-      - name: Debug message
+      - uses: actions/checkout@v4
+      - id: set
         run: |
-          echo "event: ${{github.event_name}}"
-          echo "ref: ${{github.ref}}"
-          echo "head_ref: ${{github.head_ref}}"
-#      - uses: actions/checkout@v4
-#      - name: check node
-#        run: node -v
-#      - name: Install dependecies
-#        working-directory: ./cypress
-#        run: npm i
-#      - name: Run lint
-#        working-directory: ./cypress
-#        run: npm run lint
+          PLAYWRIGHT=false
+          CYPRESS=false
+          FOLDERS=()
+
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^playwright/'; then
+            PLAYWRIGHT=true
+            FOLDERS+=("playwright")
+          fi
+
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^cypress/'; then
+            CYPRESS=true
+            FOLDERS+=("cypress")
+          fi
+
+          MATRIX_JSON=$(printf '%s\n' "${FOLDERS[@]}" | jq -R . | jq -s .)
+          echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
+          echo "playwright=$PLAYWRIGHT" >> $GITHUB_OUTPUT
+          echo "cypress=$CYPRESS" >> $GITHUB_OUTPUT
+
+  lint:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        folder: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+    name: Lint ${{ matrix.folder }}
+    container:
+      image: node:22-slim
+    steps:
+      - uses: actions/checkout@v4
+      - name: check node
+        run: node -v
+      - name: Install dependecies
+        working-directory: ./${{matrix.folder}}
+        run: npm i
+      - name: Run lint
+        working-directory: ./${{matrix.folder}}
+        run: npm run lint
+
+
+  test-playwright:
+    name: Run playwright tests
+    needs: [lint, detect-changes]
+    if: needs.detect-changes.outputs.playwright_changed == 'true'
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.52.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        working-directory: ./playwright
+        run: npm ci
+      - name: Run e2e tests
+        working-directory: ./playwright
+        run: npm run test:chromium:all
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-default
+          path: |
+                playwright/playwright-report/
+                playwright/test-results/
+          retention-days: 10
+
+  tests-cypress-chrome: 
+    name: 'Run cypress tests in chrome'
+    needs: [lint, detect-changes]
+    if: needs.detect-changes.outputs.cypress_changed == 'true'
+    runs-on: ubuntu-latest
+    container:
+     image: cypress/included:latest
+     options: --user 1001
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        working-directory: .cypress
+        run: npm ci
+      - uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          working-directory: cypress
+
+  tests-cypress-firefox: 
+    name: 'Run cypress tests in firefox'
+    needs: [lint, detect-changes]
+    if: needs.detect-changes.outputs.cypress_changed == 'true'
+    runs-on: ubuntu-latest
+    container:
+     image: cypress/included:latest
+     options: --user 1001
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        working-directory: ./cypress
+        run: npm ci
+      - uses: cypress-io/github-action@v6
+        with:
+          browser: firefox
+          working-directory: cypress
