@@ -39,7 +39,12 @@ jobs:
           fi
 
           MATRIX_JSON=$(printf '%s\n' "${FOLDERS[@]}" | jq -R . | jq -s .)
-          echo "matrix=$MATRIX_JSON\nplaywright=$PLAYWRIGHT\ncypress=$CYPRESS" >> "$GITHUB_OUTPUT"
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "matrix<<$EOF" >> $GITHUB_OUTPUT
+          echo "$MATRIX_JSON" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+          echo "playwright=$PLAYWRIGHT" >> $GITHUB_OUTPUT
+          echo "cypress=$CYPRESS" >> $GITHUB_OUTPUT
 
   lint:
     needs: detect-changes
