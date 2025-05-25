@@ -1,35 +1,44 @@
 name: CI Tests run
 on:
+  push:
+    branches:
+      - "*"
   pull_request: 
     types: ['opened']
 jobs:
-  lint-playwroght:
-    name: 'Apply Linter to playwright tests'
-    runs-on: ubuntu-latest
-    container:
-      image: node:22-slim
-    steps:
-      - uses: actions/checkout@v4
-      - name: check node
-        run: node -v
-      - name: Install dependecies
-        working-directory: ./playwright
-        run: npm i
-      - name: Run lint
-        working-directory: ./playwright
-        run: npm run lint
+#  lint-playwright:
+#    name: 'Apply Linter to playwright tests'
+#    if: ${{github.}}
+#    runs-on: ubuntu-latest
+#    container:
+#      image: node:22-slim
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: check node
+#        run: node -v
+#      - name: Install dependecies
+#        working-directory: ./playwright
+#        run: npm i
+#      - name: Run lint
+#        working-directory: ./playwright
+#        run: npm run lint
   lint-cypress:
     name: 'Apply Linter to cypress tests'
     runs-on: ubuntu-latest
-    container:
-      image: node:22-slim
+#    container:
+#      image: node:22-slim
     steps:
-      - uses: actions/checkout@v4
-      - name: check node
-        run: node -v
-      - name: Install dependecies
-        working-directory: ./cypress
-        run: npm i
-      - name: Run lint
-        working-directory: ./cypress
-        run: npm run lint
+      - name: Debug message
+        run: |
+          echo "event: ${{github.event_name}}"
+          echo "ref: ${{github.ref}}"
+          echo "head_ref: ${{github.head_ref}}"
+#      - uses: actions/checkout@v4
+#      - name: check node
+#        run: node -v
+#      - name: Install dependecies
+#        working-directory: ./cypress
+#        run: npm i
+#      - name: Run lint
+#        working-directory: ./cypress
+#        run: npm run lint
