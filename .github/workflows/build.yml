@@ -63,6 +63,7 @@ jobs:
         working-directory: ./${{ matrix.folder }}
         run: |
           echo "PWD: $(pwd)"
+          echo "Matrix folder: ${{matrix.folder}}"
           npm i
       - name: Run lint
         working-directory: ./${{ matrix.folder }}
