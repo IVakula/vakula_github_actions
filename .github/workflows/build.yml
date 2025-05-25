@@ -25,14 +25,17 @@ jobs:
           CYPRESS=false
           FOLDERS=()
 
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^playwright/'; then
+          git fetch origin ${{ github.event.before }} --depth=1
+          changed=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+
+          if echo "$changed" | grep -q '^playwright/'; then
+            folders+=("playwright")
             PLAYWRIGHT=true
-            FOLDERS+=("playwright")
           fi
 
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^cypress/'; then
+          if echo "$changed" | grep -q '^cypress/'; then
+            folders+=("cypress")
             CYPRESS=true
-            FOLDERS+=("cypress")
           fi
 
           MATRIX_JSON=$(printf '%s\n' "${FOLDERS[@]}" | jq -R . | jq -s .)
