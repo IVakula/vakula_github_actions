@@ -25,8 +25,20 @@ jobs:
           CYPRESS=false
           FOLDERS=()
 
-          git fetch origin ${{ github.event.before }} --depth=1
-          changed=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          DST=${{ github.event.before }}
+          SRC=${{ github.sha }}
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            DST=${{ github.base_ref }}
+            SRC=${{ github.head_ref }}
+          fi
+
+          echo "Event: ${{ github.event_name }}"
+          echo "DST: $DST"
+          echo "SRC: $SRC"
+
+          git fetch origin $DST --depth=1
+          changed=$(git diff --name-only $DST $SRC)
 
           if echo "$changed" | grep -q '^playwright/'; then
             FOLDERS+=("playwright")
