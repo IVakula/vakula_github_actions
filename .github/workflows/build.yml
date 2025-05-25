@@ -60,10 +60,12 @@ jobs:
       - name: check node
         run: node -v
       - name: Install dependecies
-        working-directory: ./${{matrix.folder}}
-        run: npm i
+        working-directory: ./${{ matrix.folder }}
+        run: |
+          echo "PWD: $(pwd)"
+          npm i
       - name: Run lint
-        working-directory: ./${{matrix.folder}}
+        working-directory: ./${{ matrix.folder }}
         run: npm run lint
 
 
