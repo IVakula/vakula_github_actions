@@ -30,7 +30,7 @@ jobs:
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             DST=${{ github.event.pull_request.base.sha }}
-            SRC=${{ github.event.pull_request.head.sha }}
+            #SRC=${{ github.event.pull_request.head.sha }}
           fi
 
           echo "Event: ${{ github.event_name }}"
