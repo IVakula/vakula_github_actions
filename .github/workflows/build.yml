@@ -117,7 +117,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        working-directory: .cypress
+        working-directory: cypress
         run: npm ci
       - uses: cypress-io/github-action@v6
         with:
@@ -135,7 +135,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        working-directory: ./cypress
+        working-directory: cypress
         run: npm ci
       - uses: cypress-io/github-action@v6
         with:
