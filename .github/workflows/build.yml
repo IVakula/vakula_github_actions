@@ -29,12 +29,12 @@ jobs:
           changed=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
 
           if echo "$changed" | grep -q '^playwright/'; then
-            folders+=("playwright")
+            FOLDERS+=("playwright")
             PLAYWRIGHT=true
           fi
 
           if echo "$changed" | grep -q '^cypress/'; then
-            folders+=("cypress")
+            FOLDERS+=("cypress")
             CYPRESS=true
           fi
 
