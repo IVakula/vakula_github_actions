@@ -1,0 +1,34 @@
+{
+  "name": "vakula_playwright_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test:chromium:all": "playwright test --project='Chromium Setup' --workers=1 --grep='@API-REQUESTS | @garage-setup'",
+    "test:chromium:api-req": "playwright test --project='Chromium Setup' --workers=1 --grep='@API-REQUESTS'",
+    "test:chromium:garage-setup": "playwright test  --project='Chromium Setup' --workers=1 --grep='@garage-setup'",
+    
+    "report": "npx playwright show-report",
+
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.14.0",
+    "@stylistic/eslint-plugin-js": "^4.2.0",
+    "dotenv": "^16.5.0",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-playwright": "^2.2.0",
+    "playwright": "^1.52.0",
+    "prettier": "^3.5.3"
+
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
+  }
+}
