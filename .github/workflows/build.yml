@@ -126,7 +126,7 @@ jobs:
 
   tests-cypress-firefox: 
     name: 'Run cypress tests in firefox'
-    needs: [lint, detect-changes]
+    needs: [lint, detect-changes, tests-cypress-chrome]
     if: needs.detect-changes.outputs.cypress_changed == 'true'
     runs-on: ubuntu-latest
     container:
